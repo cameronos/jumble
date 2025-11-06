@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 615501dbe4f3fe94fbf4b564abb10237, type: 3}
+  m_Name: ModConfig
+  m_EditorClassIdentifier: 
+  id: jumble
+  title: Jumble
+  author: cameronos
+  description: "Jumble 1.0\r\n\"Five words walk into a module...\"\r\n\r\nYou have
+    5 displays, each showing a jumbled word. Identify the word that is active and
+    determine its button sequence.\r\n\r\nManual included in game files, slowly posting
+    to ktane.timwi.de\r\nReport bugs to cameronos on Discord.\r\n\r\nModule ID: jumble\r\nCreated
+    by, Idea: cameronos\r\nOriginal Design (Module-220): EpicToast"
+  version: 1.0
+  outputFolder: build
+  previewImage: {fileID: 2800000, guid: 3a8a3797a88f636458423fde16fdd279, type: 3}
