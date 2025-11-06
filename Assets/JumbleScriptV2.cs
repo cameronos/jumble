@@ -24,6 +24,7 @@ public class JumbleScriptV2 : MonoBehaviour {
 	 static int jumbleNumber = 0;
 	 static int displayNumber = 0;
 
+   private const float _interactionPunchIntensity = .5f;
 	 private int currentButtonIndex = 0;
 	 private string[] activeSequence;
 
@@ -124,10 +125,10 @@ public class JumbleScriptV2 : MonoBehaviour {
 
 		// Yc0gKJ4u-TU
 		// Pyah!!!
-		for (int i = 0; i < 4; i++)
-		{
-		    Buttons[i].AddInteractionPunch();
-		}
+    for (int i = 0; i < Buttons.Length; i++)
+    {
+        Buttons[i].AddInteractionPunch(_interactionPunchIntensity);
+    }
 
    }
 
@@ -208,7 +209,49 @@ Debug.LogFormat("[Jumble #{0}] Active sequence to input for {1}: {2}",
    void Update () { //Shit that happens at any point after initialization
    }
 
+   private IEnumerator AnimateSolveText()
+   {
+       Audio.PlaySoundAtTransform("ChangeFlaps", displayTexts[0].transform);
+       float flipDelay = 0.7f;
+       int randomSteps = 2;
+
+       char[][] displayedChars = new char[displayTexts.Length][];
+       for (int i = 0; i < displayTexts.Length; i++)
+       {
+           if (displayTexts[i] == null || i >= displayWords.Length)
+               continue;
+           displayedChars[i] = jumbledWords[i].ToCharArray();
+       }
+
+       int maxLength = displayWords.Max(w => w.Length);
+
+       for (int letterIndex = 0; letterIndex < maxLength; letterIndex++)
+       {
+           for (int i = 0; i < displayTexts.Length; i++)
+           {
+               if (displayTexts[i] == null || i >= displayWords.Length)
+                   continue;
+
+               string targetWord = displayWords[i];
+               if (letterIndex >= targetWord.Length)
+                   continue;
+
+               for (int s = 0; s < randomSteps; s++)
+               {
+                   displayedChars[i][letterIndex] = (char)('A' + Rnd.Range(0, 26));
+               }
+
+               // Final correct letter
+               displayedChars[i][letterIndex] = targetWord[letterIndex];
+               displayTexts[i].text = new string(displayedChars[i]);
+           }
+
+           yield return new WaitForSeconds(flipDelay);
+       }
+   }
+
    void Solve () {
+      StartCoroutine(AnimateSolveText()); // start animation
 		  Audio.PlaySoundAtTransform("Solve", displayTexts[0].transform);
       GetComponent<KMBombModule>().HandlePass();
 			ModuleSolved = true;
