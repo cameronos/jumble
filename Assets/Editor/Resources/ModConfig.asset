@@ -14,11 +14,11 @@ MonoBehaviour:
   id: jumbleMod
   title: Jumble
   author: cameronos
-  description: "Jumble 1.2\n\"Five words walk into a module...\"\r\n\r\nYou have 5
+  description: "Jumble 1.3\n\"Five words walk into a module...\"\r\n\r\nYou have 5
     displays, each showing a jumbled word. Identify the word that is active and determine
-    its button sequence.\r\n\r\nManual included in game files, slowly posting to ktane.timwi.de\r\nReport
+    its button sequence.\r\n\r\nManual included in game files and ktane.timwi.de\r\nReport
     bugs to cameronos on Discord.\r\n\r\nModule ID: jumbleMod\r\nCreated by, Idea:
     cameronos\r\nOriginal Design (Module-220): EpicToast"
-  version: 1.2
+  version: 1.3
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 3a8a3797a88f636458423fde16fdd279, type: 3}

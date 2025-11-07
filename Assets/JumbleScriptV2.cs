@@ -20,6 +20,8 @@ public class JumbleScriptV2 : MonoBehaviour {
    public KMAudio Audio;
    public KMSelectable[] Buttons;
 	 public TextMesh[] displayTexts;
+   public Renderer moduleBG;
+   public Material[] moduleMats;
 
 	 static int jumbleNumber = 0;
 	 static int displayNumber = 0;
@@ -27,9 +29,11 @@ public class JumbleScriptV2 : MonoBehaviour {
    private const float _interactionPunchIntensity = .5f;
 	 private int currentButtonIndex = 0;
 	 private string[] activeSequence;
+   private Coroutine flashCoroutine;
 
    static int ModuleIdCounter = 1;
    int ModuleId;
+   private bool doneFlashing = false;
    private bool ModuleSolved;
 
 	 private readonly Dictionary<string, string[]> wordTable = new Dictionary<string, string[]>()
@@ -134,6 +138,7 @@ public class JumbleScriptV2 : MonoBehaviour {
 
 	 void buttonPress(int buttonIndex)
 		{
+      if(doneFlashing){
 			  Audio.PlaySoundAtTransform("Press", displayTexts[0].transform);
 		    char buttonLetter = buttonLetters[buttonIndex];
 		    Debug.LogFormat("[Jumble #{0}] Button {1} was pressed.", ModuleId, buttonLetter);
@@ -156,6 +161,7 @@ public class JumbleScriptV2 : MonoBehaviour {
 		        Strike();
 		        currentButtonIndex = 0;
 		    }
+      }
 		}
 
    void OnDestroy () { //Shit you need to do when the bomb ends
@@ -181,30 +187,64 @@ public class JumbleScriptV2 : MonoBehaviour {
 	         return number;
 	     }
 
+       private IEnumerator flashBackground()
+       {
+           float pulseSpeed = 2f; // Full pulse cycle in seconds
+
+           while (true)
+           {
+               float t = Mathf.PingPong(Time.time * pulseSpeed, 1f);
+               moduleBG.material = t > 0.5f ? moduleMats[1] : moduleMats[0];
+               yield return null;
+           }
+       }
+
+       private void resetBackgroundColor()
+       {
+           if (moduleBG != null && moduleMats != null && moduleMats.Length > 0)
+               moduleBG.material = moduleMats[0]; // Set back to normal material
+       }
+
+
+   private IEnumerator AlarmForCurrentNumber()
+   {
+       doneFlashing = false;
+       jumbleNumber = GetCurrentJumbleNumber();
+       Debug.LogFormat("[Jumble #{0}] Jumble number is {1}.", ModuleId, jumbleNumber);
+       Audio.PlaySoundAtTransform("Alarm", displayTexts[0].transform);
+       if (displayTexts != null && displayTexts.Length >= 5)
+       {
+           displayTexts[0].text = "THE";
+           displayTexts[1].text = "JUMBLE";
+           displayTexts[2].text = "NUMBER";
+           displayTexts[3].text = "IS";
+           displayTexts[4].text = jumbleNumber.ToString();
+       }
+       flashCoroutine = StartCoroutine(flashBackground());
+       yield return new WaitForSeconds(8);
+       if (flashCoroutine != null)
+               StopCoroutine(flashCoroutine);
+           resetBackgroundColor();
+       displayNumber = (jumbleNumber % 5) + 1;
+       Debug.LogFormat("[Jumble #{0}] Display number is {1}.", ModuleId, displayNumber);
+       setDisplays();
+       string activeWord = displayWords[displayNumber - 1];
+       Debug.LogFormat("[Jumble #{0}] Active word is {1}.", ModuleId, activeWord);
+       activeSequence = GetButtonSequence(activeWord);
+       currentButtonIndex = 0;
+       Debug.LogFormat("[Jumble #{0}] Jumble Number is {1} ({2})",
+           ModuleId,
+           jumbleNumber,
+           jumbleNumber > 60 ? "above 60 → sequence reversed" : "NOT above 60 → sequence is not reversed");
+       Debug.LogFormat("[Jumble #{0}] Active sequence to input for {1}: {2}",
+           ModuleId, activeWord, string.Join(", ", activeSequence));
+      doneFlashing = true;
+   }
+
 	 void Start()
 			 {
-			     jumbleNumber = GetCurrentJumbleNumber();
-			     Debug.LogFormat("[Jumble #{0}] Starting number is {1}.", ModuleId, jumbleNumber);
-
-			     displayNumber = (jumbleNumber % 5) + 1;
-			     Debug.LogFormat("[Jumble #{0}] Display number is {1}.", ModuleId, displayNumber);
-
-					 setDisplays();
-					 string activeWord = displayWords[displayNumber - 1];
-					 Debug.LogFormat("[Jumble #{0}] Active word is {1}.", ModuleId, activeWord);
-
-					 activeSequence = GetButtonSequence(activeWord);
-currentButtonIndex = 0;
-
-Debug.LogFormat("[Jumble #{0}] Jumble Number is {1} ({2})",
-    ModuleId,
-    jumbleNumber,
-    jumbleNumber > 60 ? "above 60 → sequence reversed" : "NOT above 60 → sequence is not reversed");
-
-
-Debug.LogFormat("[Jumble #{0}] Active sequence to input for {1}: {2}",
-                ModuleId, activeWord, string.Join(", ", activeSequence));
-			 }
+           StartCoroutine(AlarmForCurrentNumber());
+     }
 
    void Update () { //Shit that happens at any point after initialization
    }
@@ -253,11 +293,20 @@ Debug.LogFormat("[Jumble #{0}] Active sequence to input for {1}: {2}",
    void Solve () {
       StartCoroutine(AnimateSolveText()); // start animation
 		  Audio.PlaySoundAtTransform("Solve", displayTexts[0].transform);
+      moduleBG.material = moduleMats[2];
       GetComponent<KMBombModule>().HandlePass();
 			ModuleSolved = true;
    }
 
+   private IEnumerator strikeBackground(){
+    float waitTime = 0.2f;
+    moduleBG.material = moduleMats[1];
+    yield return new WaitForSeconds(waitTime);
+    moduleBG.material = moduleMats[0];
+   }
+
    void Strike () {
+     StartCoroutine(strikeBackground()); // strike red
 		  Audio.PlaySoundAtTransform("Strike", displayTexts[0].transform);
       GetComponent<KMBombModule>().HandleStrike();
    }

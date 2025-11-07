@@ -3584,6 +3584,11 @@ MonoBehaviour:
   - {fileID: 102364462031395932}
   - {fileID: 102317046333980782}
   - {fileID: 102618274389210044}
+  moduleBG: {fileID: 23308064165175722}
+  moduleMats:
+  - {fileID: 2100000, guid: 26cdee844cb231740941635a5e5962c7, type: 2}
+  - {fileID: 2100000, guid: ba3b3a8be572eec43b0fde3fc9d9f446, type: 2}
+  - {fileID: 2100000, guid: 8592a8ac55b369344b9ada6f71e1c37c, type: 2}
   buttonLetters: 41004200430044004500
 --- !u!114 &114870269615542354
 MonoBehaviour:
