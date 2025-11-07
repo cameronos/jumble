@@ -309,6 +309,8 @@ public class JumbleScriptV2 : MonoBehaviour {
      StartCoroutine(strikeBackground()); // strike red
 		  Audio.PlaySoundAtTransform("Strike", displayTexts[0].transform);
       GetComponent<KMBombModule>().HandleStrike();
+      //well, OKAY... since you asked so politely
+      StartCoroutine(AlarmForCurrentNumber());
    }
 
 	 //Twitch Plays code
